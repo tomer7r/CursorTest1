@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokyo Weather & Time</title>
+    <title>משפחת נוי ומשפחת רייס איזק נוסעות ליפן</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -137,10 +137,35 @@
             font-weight: 300;
             opacity: 0.7;
         }
+        
+        .japan-flag {
+            background: white;
+            width: 120px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .flag-circle {
+            width: 40px;
+            height: 40px;
+            background: #bc002d;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        
+        <div class="japan-flag">
+            <div class="flag-circle"></div>
+        </div>
         
         <div class="countdown" id="countdown">
             <div class="countdown-label">Time until Japan Trip:</div>
