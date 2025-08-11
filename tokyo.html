@@ -99,11 +99,71 @@
             background: #5a6fd8;
             transform: translateY(-2px);
         }
+        
+        .countdown {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .countdown-label {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .countdown-item {
+            text-align: center;
+        }
+        .countdown-number {
+            font-size: 2.5em;
+            font-weight: 300;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 5px;
+        }
+        .countdown-label-small {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .countdown-separator {
+            font-size: 2em;
+            font-weight: 300;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        
+        <div class="countdown" id="countdown">
+            <div class="countdown-label">Time until Japan Trip:</div>
+            <div class="countdown-timer">
+                <div class="countdown-item">
+                    <div class="countdown-number" id="days">--</div>
+                    <div class="countdown-label-small">Days</div>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="hours">--</div>
+                    <div class="countdown-label-small">Hours</div>
+                </div>
+                <div class="countdown-separator">:</div>
+                <div class="countdown-item">
+                    <div class="countdown-number" id="minutes">--</div>
+                    <div class="countdown-label-small">Minutes</div>
+                </div>
+            </div>
+        </div>
+
         <h1 class="city">Tokyo Time</h1>
+
         <div class="time" id="time">Loading...</div>
         
         <div class="weather" id="weather">
@@ -115,6 +175,32 @@
 
     <script>
         // Tokyo timezone handling
+        
+        function updateCountdown() {
+            // Target date: September 20, 2025 at 10:00 PM Israel time
+            const targetDate = new Date('2025-09-20T22:00:00+03:00'); // Israel timezone UTC+3
+            const now = new Date();
+            
+            // Calculate time difference
+            const timeDiff = targetDate.getTime() - now.getTime();
+            
+            if (timeDiff > 0) {
+                // Calculate days, hours, and minutes
+                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                // Update the display
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            } else {
+                // Trip has started or passed
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+            }
+        }
         
         function updateTime() {
             // Get current time in Tokyo timezone directly
@@ -200,8 +286,12 @@
         }
         
         // Initialize
+        updateCountdown();
         updateTime();
         fetchWeather();
+        
+        // Update countdown every minute
+        setInterval(updateCountdown, 60000);
         
         // Update time every second
         setInterval(updateTime, 1000);
