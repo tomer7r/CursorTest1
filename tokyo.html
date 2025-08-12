@@ -181,6 +181,35 @@
             height: 100%;
             object-fit: cover;
         }
+        
+        .mock-weather {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .error h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+        
+        .error ol {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .error a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .error a:hover {
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -273,36 +302,35 @@
         
         async function fetchWeather() {
             try {
-                // Using OpenWeatherMap API (free tier)
-                // Note: You'll need to sign up for a free API key at openweathermap.org
                 const city = 'Tokyo';
-                const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your actual API key
-                const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
                 
-                // For demo purposes, showing mock data since we don't have an API key
-                // In production, you would use the actual API call above
-                const mockData = {
-                    main: {
-                        temp: 22.5,
-                        humidity: 65,
-                        pressure: 1013
-                    },
-                    weather: [{
-                        description: 'Partly cloudy',
-                        main: 'Clouds'
-                    }],
-                    wind: {
-                        speed: 3.2
-                    }
-                };
+                // Use wttr.in API - no API key required!
+                const url = `https://wttr.in/${city}?format=j1`;
+                const response = await fetch(url);
                 
-                displayWeather(mockData);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayWeather(data);
                 
             } catch (error) {
                 console.error('Error fetching weather:', error);
+                
+                let errorMessage = 'Unable to fetch weather data.';
+                
+                if (error.message.includes('HTTP error! status: 429')) {
+                    errorMessage = 'Rate limit exceeded. Please try again later.';
+                } else if (error.message.includes('fetch')) {
+                    errorMessage = 'Network error. Please check your internet connection.';
+                }
+                
                 document.getElementById('weather').innerHTML = `
                     <div class="error">
-                        Unable to fetch weather data. Please check your internet connection.
+                        <h3>❌ Weather Data Error</h3>
+                        <p>${errorMessage}</p>
+                        <p><small>Error details: ${error.message}</small></p>
                     </div>
                 `;
             }
@@ -310,25 +338,35 @@
         
         function displayWeather(data) {
             const weatherDiv = document.getElementById('weather');
+            
+            // Extract data from wttr.in format
+            const current = data.current_condition[0];
+            const temp = current.temp_C;
+            const description = current.weatherDesc[0].value;
+            const humidity = current.humidity;
+            const windSpeed = current.windspeedKmph;
+            const pressure = current.pressure;
+            const feelsLike = current.FeelsLikeC;
+            
             weatherDiv.innerHTML = `
-                <div class="temperature">${Math.round(data.main.temp)}°C</div>
-                <div class="description">${data.weather[0].description}</div>
+                <div class="temperature">${temp}°C</div>
+                <div class="description">${description}</div>
                 <div class="details">
                     <div class="detail-item">
+                        <div class="detail-label">Feels Like</div>
+                        <div class="detail-value">${feelsLike}°C</div>
+                    </div>
+                    <div class="detail-item">
                         <div class="detail-label">Humidity</div>
-                        <div class="detail-value">${data.main.humidity}%</div>
+                        <div class="detail-value">${humidity}%</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Wind Speed</div>
-                        <div class="detail-value">${data.wind.speed} m/s</div>
+                        <div class="detail-value">${windSpeed} km/h</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Pressure</div>
-                        <div class="detail-value">${data.main.pressure} hPa</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Condition</div>
-                        <div class="detail-value">${data.weather[0].main}</div>
+                        <div class="detail-value">${pressure} mb</div>
                     </div>
                 </div>
             `;
