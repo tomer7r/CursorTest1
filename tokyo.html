@@ -234,39 +234,9 @@
             font-family: 'Courier New', monospace;
         }
         
-        .test-api-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8em;
-            margin-left: 15px;
-            transition: all 0.3s ease;
-        }
+
         
-        .test-api-btn:hover {
-            background: #218838;
-            transform: translateY(-1px);
-        }
-        
-        .test-proxy-btn {
-            background: #17a2b8;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8em;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .test-proxy-btn:hover {
-            background: #138496;
-            transform: translateY(-1px);
-        }
+
     </style>
 </head>
 <body>
@@ -314,8 +284,6 @@
         <div class="visit-counter">
             <div class="counter-label">Page Visits:</div>
             <div class="counter-number" id="visitCount">--</div>
-            <button class="test-api-btn" onclick="testVisitAPI()">Test API</button>
-            <button class="test-proxy-btn" onclick="testMultipleProxies()">Test Proxies</button>
         </div>
     </div>
 
@@ -440,18 +408,7 @@
             try {
                 console.log('Fetching visit count...');
                 
-                // Try direct request first
-                let response;
-                try {
-                    response = await fetch('https://visit-counter-8b96.onrender.com/visit');
-                } catch (corsError) {
-                    console.log('Direct request failed, trying CORS proxy...');
-                    // Use CORS proxy as fallback
-                    response = await fetch('https://cors-anywhere.herokuapp.com/https://visit-counter-8b96.onrender.com/visit');
-                }
-                
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
+                const response = await fetch('https://visit-counter-8b96.onrender.com/visit');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -463,17 +420,7 @@
                 
             } catch (error) {
                 console.error('Error fetching visit count:', error);
-                console.error('Error name:', error.name);
-                console.error('Error message:', error.message);
-                
-                let errorText = 'Error';
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    errorText = 'CORS Error';
-                } else if (error.message.includes('Failed to fetch')) {
-                    errorText = 'Network Error';
-                }
-                
-                document.getElementById('visitCount').textContent = errorText;
+                document.getElementById('visitCount').textContent = 'Error';
             }
         }
         
@@ -482,37 +429,9 @@
             fetchVisitCount(); // Also refresh visit count when refresh button is clicked
         }
         
-        function testVisitAPI() {
-            console.log('Testing visit API manually...');
-            fetchVisitCount();
-        }
+
         
-        async function testMultipleProxies() {
-            const proxies = [
-                'https://cors-anywhere.herokuapp.com/',
-                'https://api.allorigins.win/raw?url=',
-                'https://cors.bridged.cc/',
-                'https://thingproxy.freeboard.io/fetch/'
-            ];
-            
-            for (let i = 0; i < proxies.length; i++) {
-                try {
-                    console.log(`Trying proxy ${i + 1}: ${proxies[i]}`);
-                    const response = await fetch(proxies[i] + 'https://visit-counter-8b96.onrender.com/visit');
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log(`Proxy ${i + 1} worked! Data:`, data);
-                        document.getElementById('visitCount').textContent = data.count;
-                        return;
-                    }
-                } catch (error) {
-                    console.log(`Proxy ${i + 1} failed:`, error.message);
-                }
-            }
-            
-            document.getElementById('visitCount').textContent = 'All proxies failed';
-        }
+
         
         // Initialize
         updateCountdown();
